@@ -1,0 +1,15 @@
+{
+  "name": "portfolio-manager-rest-service",
+  "version": "1.0.0",
+  "description": "Backend for Portfolio Manager app.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Harsimar Singh",
+  "license": "MIT",
+  "dependencies": {
+    "amfi-database-creator": "^1.0.1",
+    "express": "^4.17.1"
+  }
+}
