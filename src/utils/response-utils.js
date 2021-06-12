@@ -7,6 +7,13 @@ class ResponseUtils{
         });
     }
 
+    static badRequest = (res,message = undefined, errors = undefined) =>{
+        res.status(400).json({
+            success:false,
+            message,errors
+        });
+    }
+
     static unauthorized = (res,message = undefined) => {
         res.status(401).json({
             success:false,
