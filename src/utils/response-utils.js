@@ -1,6 +1,6 @@
 class ResponseUtils{
     static success = (res,message = undefined ,data = undefined) => {
-        res.status(200).json({
+        return res.status(200).json({
             success:true,
             message,
             data
@@ -8,21 +8,28 @@ class ResponseUtils{
     }
 
     static badRequest = (res,message = undefined, errors = undefined) =>{
-        res.status(400).json({
+        return res.status(400).json({
             success:false,
             message,errors
         });
     }
 
+    static forbidden = (res,message = undefined) => {
+        return res.status(403).json({
+            success:false,
+            message
+        });
+    }
+
     static unauthorized = (res,message = undefined) => {
-        res.status(401).json({
+        return res.status(401).json({
             success:false,
             message
         });
     }
 
     static serverError = (res) => {
-        res.status(500).json({
+        return res.status(500).json({
             success:false,
             message:'Internal Server Error'
         });
