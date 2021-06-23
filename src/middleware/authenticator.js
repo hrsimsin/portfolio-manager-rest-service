@@ -9,7 +9,7 @@ const authenticator = async (req, res, next) => {
         if (!authHeader)
             return ResponseUtils.unauthorized(res, 'No auth header provided.');
         else {
-            const token = authHeader.split(' ')[1];
+            const token = (authHeader.split(' '))[1];
             const decodedToken = jwt.verify(token, Config.jwtSecret);
             const email = decodedToken.email;
             const user = await User.findOne({ email });

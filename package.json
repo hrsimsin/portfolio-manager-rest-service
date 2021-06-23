@@ -9,12 +9,14 @@
   "author": "Harsimar Singh",
   "license": "MIT",
   "dependencies": {
-    "amfi-database-creator": "^1.0.3",
+    "amfi-database-creator": "^1.1.0",
     "bcrypt": "^5.0.1",
     "express": "^4.17.1",
-    "express-validator": "^6.11.1",
+    "express-validator": "^6.12.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "^5.12.13"
+    "minisearch": "^3.0.2",
+    "mongoose": "^5.12.14",
+    "node-cron": "^3.0.0"
   },
   "devDependencies": {
     "nodemon": "^2.0.7"
