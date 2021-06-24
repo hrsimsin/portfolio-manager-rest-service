@@ -4,6 +4,7 @@ const errorCheck = require("../middleware/error-check");
 const schemeCodeValidator = require("../validators/scheme-code");
 const ResponseUtils = require("../utils/response-utils");
 const express = require("express");
+const User = require("../models/user");
 
 const getUserRouter = (MutualFund) => {
   const router = express.Router();
@@ -12,6 +13,35 @@ const getUserRouter = (MutualFund) => {
     return new Promise(async (resolve, reject) => {
       if (transactionType === "buy" || transactionType === "sell") resolve();
       reject(`Param 'type' must be either 'buy' or 'sell'.`);
+    });
+  };
+
+  const unitsSellValidator = (units, { req }) => {
+    return new Promise(async (resolve, reject) => {
+      if (req.body.type === "sell") {
+        let schemeObj = req.user.transactions.filter(
+          (el) => el["Scheme Code"] === req.fund["Scheme Code"]
+        )[0];
+
+        if (!schemeObj)
+          reject(
+            `Cannot register sell transaction of ${req.body.units}. Units owned till this date are 0.`
+          );
+
+        let totalUnits = 0;
+        const sellDate = new Date(req.body["nav-date"]);
+        for (let transaction of schemeObj.schemeTransactions) {
+          if (new Date(transaction.navDate) < sellDate) {
+            if (transaction.type === "buy") totalUnits += transaction.units;
+            else totalUnits -= transaction.units;
+          }
+        }
+        if (totalUnits < req.body.units)
+          reject(
+            `Cannot register sell transaction of ${req.body.units}. Units owned till this date are ${totalUnits}.`
+          );
+      }
+      resolve();
     });
   };
 
@@ -66,8 +96,30 @@ const getUserRouter = (MutualFund) => {
       .isFloat({ min: 0.001, max: 99999999 })
       .withMessage("Must be a float in range [0.001,99999999]."),
     errorCheck,
+    body("units").custom(unitsSellValidator),
+    errorCheck,
     async (req, res) => {
-      ResponseUtils.success(res);
+      let schemeObj = req.user.transactions.filter(
+        (el) => el["Scheme Code"] === req.fund["Scheme Code"]
+      )[0];
+      if (!schemeObj) {
+        schemeObj = {
+          "Scheme Code": req.fund["Scheme Code"],
+          schemeTransactions: [],
+        };
+        req.user.transactions.push(schemeObj);
+        schemeObj = req.user.transactions[req.user.transactions.length - 1];
+      }
+
+      schemeObj.schemeTransactions.push({
+        type: req.body.type,
+        navDate: req.navObj._id,
+        nav: req.navObj.NAV,
+        units: req.body.units,
+      });
+      await req.user.save();
+
+      ResponseUtils.success(res, "Transaction registered successfully.");
     }
   );
 
