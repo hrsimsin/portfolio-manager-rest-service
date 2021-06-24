@@ -34,6 +34,7 @@
     "/mutual-funds",
     require("./routers/mutual-fund")(navDB.MutualFund, fundSearch)
   );
+  app.use("/user", require("./routers/user")(navDB.MutualFund));
 
   app.listen(Config.port, Config.ip);
   console.log(`Server is listening on ${Config.ip}:${Config.port}`);

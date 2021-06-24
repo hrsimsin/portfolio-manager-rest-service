@@ -3,16 +3,9 @@ const authenticator = require("../middleware/authenticator");
 const ResponseUtils = require("../utils/response-utils");
 const { query, validationResult, param } = require("express-validator");
 const errorCheck = require("../middleware/error-check");
+const schemeCodeValidator = require("../validators/scheme-code");
 
 const getMutualFundRouter = (MutualFund, fundSearch) => {
-  const schemeCodeValidator = (schemeCode) => {
-    return new Promise(async (resolve, reject) => {
-      if (!(await MutualFund.exists({ "Scheme Code": schemeCode })))
-        reject("Invalid Scheme Code.");
-      resolve();
-    });
-  };
-
   const router = express.Router();
 
   router.get(
@@ -45,16 +38,10 @@ const getMutualFundRouter = (MutualFund, fundSearch) => {
   router.get(
     "/:scheme_code",
     authenticator,
-    param("scheme_code")
-      .isInt({ min: 100001, max: 999999 })
-      .withMessage("Must be an integer in range [100001,999999].")
-      .custom(schemeCodeValidator),
+    schemeCodeValidator(param("scheme_code"), MutualFund),
     errorCheck,
     async (req, res) => {
-      const fund = await MutualFund.findOne({
-        "Scheme Code": req.params["scheme_code"],
-      });
-      ResponseUtils.success(res, "Fund fetched.", fund);
+      ResponseUtils.success(res, "Fund fetched.", req.fund);
     }
   );
 
